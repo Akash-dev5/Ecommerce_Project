@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: ecommerce_raw
+    database: ecommerce
+    schema: raw
+    tables:
+      # Transactional tables
+      - name: raw_orders
+      - name: raw_customers
+      - name: raw_order_items
+      - name: raw_payments
+      - name: raw_reviews
+
+
+      # Reference tables
+      - name: raw_products
+      - name: raw_sellers
+      - name: raw_geolocation
+      - name: raw_product_category_translation

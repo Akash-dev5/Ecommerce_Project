@@ -1,0 +1,9 @@
+order_status,status_category
+approved,in_progress
+canceled,cancelled
+created,in_progress
+delivered,completed
+invoiced,in_progress
+processing,in_progress
+shipped,in_progress
+unavailable,exception

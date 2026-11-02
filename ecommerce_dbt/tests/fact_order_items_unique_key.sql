@@ -1,0 +1,12 @@
+SELECT
+    ORDER_ID,
+    ORDER_ITEM_ID,
+    COUNT(*) AS DUPLICATE_COUNT
+
+FROM {{ ref('fact_order_items') }}
+
+GROUP BY
+    ORDER_ID,
+    ORDER_ITEM_ID
+
+HAVING COUNT(*) > 1

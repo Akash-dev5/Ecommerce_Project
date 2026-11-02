@@ -1,0 +1,23 @@
+version: 2
+
+seeds:
+  - name: order_status_mapping
+    description: "Maps raw order statuses to business categories."
+    columns:
+      - name: order_status
+        description: "Original order status used as the mapping key."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: status_category
+        description: "Business category assigned to each order status."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - completed
+                  - cancelled
+                  - in_progress
+                  - exception

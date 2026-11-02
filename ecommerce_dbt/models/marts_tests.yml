@@ -1,0 +1,84 @@
+
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension containing customer identifiers and descriptive attributes."
+
+  - name: dim_products
+    description: "Product dimension enriched with English product category names."
+
+  - name: dim_sellers
+    description: "Seller dimension containing seller identifiers and location attributes."
+
+  - name: fact_orders
+    description: "Order-level fact table containing item totals, payment totals, review metrics, and order status categories."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+  - name: fact_order_items
+    description: "Item-level fact table with one row per order item and its product price, freight, and related order attributes."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+      - name: order_item_id
+        data_tests:
+          - not_null
+
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+
+      - name: seller_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sellers')
+                field: seller_id
+
+
+
+unit_tests:
+  - name: test_dim_products_translation_fallback
+    description: "Checks that English translations are used when available and original categories are retained otherwise."
+    model: dim_products
+
+    given:
+      - input: ref('stg_products')
+        format: dict
+        rows:
+          - {PRODUCT_ID: "P001", PRODUCT_CATEGORY_NAME: "beleza_saude", PRODUCT_NAME_LENGTH: 20, PRODUCT_DESCRIPTION_LENGTH: 100, PRODUCT_PHOTOS_QTY: 2, PRODUCT_WEIGHT_G: 500, PRODUCT_LENGTH_CM: 20, PRODUCT_HEIGHT_CM: 10, PRODUCT_WIDTH_CM: 15}
+          - {PRODUCT_ID: "P002", PRODUCT_CATEGORY_NAME: "categoria_nova", PRODUCT_NAME_LENGTH: 15, PRODUCT_DESCRIPTION_LENGTH: 80, PRODUCT_PHOTOS_QTY: 1, PRODUCT_WEIGHT_G: 200, PRODUCT_LENGTH_CM: 10, PRODUCT_HEIGHT_CM: 5, PRODUCT_WIDTH_CM: 8}
+
+      - input: ref('stg_product_category_translation')
+        format: dict
+        rows:
+          - {PRODUCT_CATEGORY_NAME: "beleza_saude", PRODUCT_CATEGORY_NAME_ENGLISH: "health_beauty"}
+
+    expect:
+      format: dict
+      rows:
+        - {PRODUCT_ID: "P001", PRODUCT_CATEGORY_NAME: "beleza_saude", PRODUCT_CATEGORY_NAME_ENGLISH: "health_beauty", PRODUCT_NAME_LENGTH: 20, PRODUCT_DESCRIPTION_LENGTH: 100, PRODUCT_PHOTOS_QTY: 2, PRODUCT_WEIGHT_G: 500, PRODUCT_LENGTH_CM: 20, PRODUCT_HEIGHT_CM: 10, PRODUCT_WIDTH_CM: 15}
+        - {PRODUCT_ID: "P002", PRODUCT_CATEGORY_NAME: "categoria_nova", PRODUCT_CATEGORY_NAME_ENGLISH: "categoria_nova", PRODUCT_NAME_LENGTH: 15, PRODUCT_DESCRIPTION_LENGTH: 80, PRODUCT_PHOTOS_QTY: 1, PRODUCT_WEIGHT_G: 200, PRODUCT_LENGTH_CM: 10, PRODUCT_HEIGHT_CM: 5, PRODUCT_WIDTH_CM: 8}

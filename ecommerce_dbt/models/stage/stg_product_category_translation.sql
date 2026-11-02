@@ -1,0 +1,6 @@
+SELECT
+    TRIM(PRODUCT_CATEGORY_NAME) AS PRODUCT_CATEGORY_NAME,
+    TRIM(PRODUCT_CATEGORY_NAME_ENGLISH)
+        AS PRODUCT_CATEGORY_NAME_ENGLISH
+
+FROM {{ source('ecommerce_raw', 'raw_product_category_translation') }}

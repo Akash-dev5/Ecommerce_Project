@@ -1,0 +1,47 @@
+name: 'ecommerce_dbt'
+version: '1.0.0'
+
+
+profile: 'ecommerce_dbt'
+
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         
+  - "dbt_packages"
+
+
+
+models:
+  ecommerce_dbt:
+    
+    stage:
+      +schema: stage
+      +materialized: view
+
+    marts:
+      +schema: marts
+      +materialized: table
+
+    OBT:
+      +schema: OBT
+      +materialized: table
+
+
+snapshots:
+  ecommerce_dbt:
+    +schema: ANALYTICS_SNAPSHOTS
+
+
+seeds:
+  ecommerce_dbt:
+    order_status_mapping:
+      +schema: marts
+      +column_types:
+        order_status: varchar
+        status_category: varchar

@@ -1,0 +1,122 @@
+
+version: 2
+
+models:
+  - name: stg_orders
+    description: "Standardizes order records and derives the purchase date."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_status
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('order_status_mapping')
+                field: order_status
+
+  - name: stg_customers
+    description: "Standardizes customer identifiers and location attributes."
+    columns:
+      - name: customer_id
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_order_items
+    description: "Prepares order-item prices, freight, product identifiers, and seller identifiers."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+      - name: order_item_id
+        data_tests:
+          - not_null
+
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+      - name: seller_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_sellers')
+                field: seller_id
+
+  - name: stg_payments
+    description: "Standardizes payment methods, payment identifiers, and payment amounts."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+      - name: payment_sequential
+        data_tests:
+          - not_null
+
+  - name: stg_reviews
+    description: "Prepares customer review scores, comments, and timestamps."
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+
+      - name: review_score
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+
+  - name: stg_products
+    description: "Standardizes product attributes and product category names."
+    columns:
+      - name: product_id
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_sellers
+    description: "Standardizes seller identifiers and location attributes."
+    columns:
+      - name: seller_id
+        data_tests:
+          - not_null
+          - unique
+
+  - name: stg_geolocation
+    description: "Prepares postal-code prefixes, cities, states, and geographic coordinates."
+    columns:
+      - name: geolocation_zip_code_prefix
+        data_tests:
+          - not_null
+
+  - name: stg_product_category_translation
+    description: "Provides English translations for product category names."
+    columns:
+      - name: product_category_name
+        data_tests:
+          - not_null
+          - unique

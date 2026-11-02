@@ -1,0 +1,76 @@
+WITH order_item_agg AS (
+
+    SELECT
+        ORDER_ID,
+        COUNT(*) AS ORDER_ITEM_COUNT,
+        SUM(PRICE) AS TOTAL_ITEM_PRICE,
+        SUM(FREIGHT_VALUE) AS TOTAL_FREIGHT,
+        SUM(PRICE + FREIGHT_VALUE) AS TOTAL_ITEM_VALUE_WITH_FREIGHT
+
+    FROM {{ ref('stg_order_items') }}
+    GROUP BY ORDER_ID
+
+),
+
+payment_agg AS (
+
+    SELECT
+        ORDER_ID,
+        COUNT(*) AS PAYMENT_COUNT,
+        SUM(PAYMENT_VALUE) AS TOTAL_PAYMENT_VALUE
+
+    FROM {{ ref('stg_payments') }}
+    GROUP BY ORDER_ID
+
+),
+
+review_agg AS (
+
+    SELECT
+        ORDER_ID,
+        COUNT(REVIEW_ID) AS REVIEW_COUNT,
+        AVG(REVIEW_SCORE) AS AVG_REVIEW_SCORE
+
+    FROM {{ ref('stg_reviews') }}
+    GROUP BY ORDER_ID
+
+)
+
+SELECT
+    o.ORDER_ID,
+    o.CUSTOMER_ID,
+    o.ORDER_STATUS,
+    sm.STATUS_CATEGORY,
+
+    o.ORDER_PURCHASE_TIMESTAMP,
+    o.ORDER_PURCHASE_DATE,
+    o.ORDER_APPROVED_AT,
+    o.ORDER_DELIVERED_CARRIER_DATE,
+    o.ORDER_DELIVERED_CUSTOMER_DATE,
+    o.ORDER_ESTIMATED_DELIVERY_DATE,
+
+    i.ORDER_ITEM_COUNT,
+    i.TOTAL_ITEM_PRICE,
+    i.TOTAL_FREIGHT,
+    i.TOTAL_ITEM_VALUE_WITH_FREIGHT,
+
+    p.PAYMENT_COUNT,
+    p.TOTAL_PAYMENT_VALUE,
+
+    r.REVIEW_COUNT,
+    r.AVG_REVIEW_SCORE
+
+
+FROM {{ ref('stg_orders') }} AS o
+
+LEFT JOIN order_item_agg AS i
+    ON o.ORDER_ID = i.ORDER_ID
+
+LEFT JOIN payment_agg AS p
+    ON o.ORDER_ID = p.ORDER_ID
+
+LEFT JOIN review_agg AS r
+    ON o.ORDER_ID = r.ORDER_ID
+
+LEFT JOIN {{ ref('order_status_mapping') }} AS sm
+    ON o.ORDER_STATUS = sm.ORDER_STATUS

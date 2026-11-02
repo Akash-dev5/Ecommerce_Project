@@ -1,0 +1,14 @@
+version: 2
+
+snapshots:
+  - name: orders_snapshot
+    description: "Tracks changes in order status and selected timestamps across snapshot runs."
+    columns:
+      - name: ORDER_ID
+        description: "Stable identifier for an order."
+
+      - name: DBT_VALID_FROM
+        description: "Timestamp when this version became valid."
+
+      - name: DBT_VALID_TO
+        description: "Timestamp when this version ceased to be current; NULL means current."
