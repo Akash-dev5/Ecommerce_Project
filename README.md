@@ -131,5 +131,5 @@ Source records are from a publicly distributed Brazilian e-commerce dataset prov
 
 `SQL` · `Snowflake` · `dbt` · `Data Engineering`
 
-akash.data55@gmail.com
+[akash.data55@gmail.com](mailto:akash.data55@gmail.com)  
 [GitHub](https://github.com/Akash-dev5)
